@@ -1,33 +1,25 @@
 trigger:
-  - main 
+  - main
 
 pool:
   name: 'Default'
 
-variables:
-  buildConfiguration: 'Release'
-
 steps:
-  - task: UseDotNet@2
-    displayName: 'Use .NET 8 SDK'
+  - task: Maven@4
+    displayName: 'Build with Maven'
     inputs:
-      packageType: 'sdk'
-      version: '8.x'
+      mavenPomFile: 'pom.xml'
+      goals: 'clean package -DskipTests'
+      publishJUnitResults: false
 
-  - task: DotNetCoreCLI@2
-    displayName: 'Build Web App'
+  - task: CopyFiles@2
+    displayName: 'Copy artifact to staging'
     inputs:
-      command: 'build'
-      projects: '**/*.csproj'
-      arguments: '--configuration $(buildConfiguration)'
-
-  - task: DotNetCoreCLI@2
-    displayName: 'Publish Web App'
-    inputs:
-      command: 'publish'
-      publishWebProjects: true
-      arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)'
-      zipAfterPublish: true
+      SourceFolder: '$(System.DefaultWorkingDirectory)'
+      Contents: |
+        **/target/*.war
+        **/target/*.jar
+      TargetFolder: '$(Build.ArtifactStagingDirectory)'
 
   - task: PublishBuildArtifacts@1
     displayName: 'Publish Artifact: drop'
