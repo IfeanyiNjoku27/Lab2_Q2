@@ -15,7 +15,6 @@ pipeline {
     stages {
         stage("Checkout") {
             steps {
-                // IMPORTANT: Replace the URL below with the actual link to your GitHub repository!
                 git branch: 'main', url: 'https://github.com/IfeanyiNjoku27/Lab2_Q2.git'
             }
         }
